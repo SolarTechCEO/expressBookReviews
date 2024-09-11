@@ -21,7 +21,7 @@ app.use("/customer/auth/*", function auth(req,res,next){
             }
         })
     } else {
-        return res.status(403).json({ message: "Invalid Login Details" })
+        return res.status(403).json({ message: "No Authorization" })
     }
 });
  
