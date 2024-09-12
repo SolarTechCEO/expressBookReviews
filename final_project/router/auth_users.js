@@ -56,23 +56,12 @@ regd_users.post("/login", (req, res) => {
 regd_users.put("/auth/review/:isbn", (req, res) => {
     if (req.params.isbn && req.body.review) {
         if (books[req.params.isbn]) {
-            let reviewed = false;
-
-            Object.entries(books).filter(book =>
-                book.forEach(b => {
-                    if (Object.entries(b.reviews).filter(r => r.username === req.session.authorization.username)) {
-                        reviewed = true;
-                    }
-                }));
-
-            if (!reviewed) {
-                books[req.params.isbn].reviews["username"] = req.session.authorization.username
-                books[req.params.isbn].reviews["review"] = req.body.review
-                return res.status(200).json({ message: "Successfully Created A New Review For " + books[req.params.isbn].title })
+            if (books[req.params.isbn].reviews[req.session.authorization.username]) {
+                books[req.params.isbn].reviews[req.session.authorization.username] = req.body.review;
+                return res.status(200).json({ message: "Successfully Edited Existing Review For " + books[req.params.isbn].title })
             } else {
-                books[req.params.isbn].reviews["username"] = req.session.authorization.username
-                books[req.params.isbn].reviews["review"] = req.body.review
-                return res.status(200).json({ message: "Successfully Edited The Review Of " + books[req.params.isbn].title })
+                books[req.params.isbn].reviews[req.session.authorization.username] = req.body.review;
+                return res.status(200).json({ message: "Successfully Created A New Review For " + books[req.params.isbn].title })
             }
         } else {
             return res.status(400).json({ message: "Invalid ISBN Provided" })
