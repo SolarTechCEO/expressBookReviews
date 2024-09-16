@@ -20,52 +20,82 @@ public_users.post("/register", (req, res) => {
 
 // Get the book list available in the shop
 public_users.get('/', function (req, res) {
-    return res.send(JSON.stringify(books));
+    let bookPromise = new Promise((resolve, reject) => {
+        resolve(JSON.stringify(books));
+    })
+
+    bookPromise.then((msg) => {
+        return res.send(msg)
+    })
 });
 
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn', function (req, res) {
-    if (req.params.isbn) {
-        if (books[req.params.isbn]) {
-            return res.send(JSON.stringify(books[req.params.isbn]))
+    let findBook = new Promise((resolve, reject) => {
+        if (req.params.isbn) {
+            if (books[req.params.isbn]) {
+                resolve(JSON.stringify(books[req.params.isbn]))
+            } else {
+                reject("Invalid ISBN Provided")
+            }
         } else {
-            return res.status(400).json({ message: "Invalid ISBN Provided" })
+            reject("No ISBN Provided")
         }
-    } else {
-        return res.status(400).json({ message: "No ISBN Provided" })
-    }
+    })
+
+    findBook.then((msg) => {
+        return res.send(msg)
+    }).catch(reject => {
+        return res.status(400).json({ message: reject })
+    })
 });
 
 // Get book details based on author
 public_users.get('/author/:author', function (req, res) {
-    let booksData = [];
+    let findBookByAuthor = new Promise((resolve, reject) => {
+        let booksData = [];
 
-    if (req.params.author) {
-        Object.entries(books).filter(book => book.forEach(b => { if (b.author === req.params.author) booksData.push(b) }));
-        if (booksData.length == 0) {
-            return res.status(400).json({ message: "No Books Found with Provided Author" })
+        if (req.params.author) {
+            Object.entries(books).filter(book => book.forEach(b => { if (b.author === req.params.author) booksData.push(b) }));
+            if (booksData.length == 0) {
+                reject("No Books Found with Provided Author")
+            } else {
+                resolve(JSON.stringify(booksData))
+            }
         } else {
-            return res.send(JSON.stringify(booksData))
+            reject("No Author Provided")
         }
-    } else {
-        return res.status(400).json({ message: "No Author Provided" })
-    }
+    })
+
+    findBookByAuthor.then((msg) => {
+        return res.send(msg)
+    }).catch(reject => {
+        return res.status(400).json({ message: reject })
+    })
 });
 
 // Get all books based on title
 public_users.get('/title/:title', function (req, res) {
-    let booksData = [];
+    let findBookByTitle = new Promise((resolve, reject) => {
+        let booksData = [];
 
-    if (req.params.title) {
-        Object.entries(books).filter(book => book.forEach(b => { if (b.title === req.params.title) booksData.push(b) }));
-        if (booksData.length == 0) {
-            return res.status(400).json({ message: "No Books Found with Provided Title" })
+        if (req.params.title) {
+            Object.entries(books).filter(book => book.forEach(b => { if (b.title === req.params.title) booksData.push(b) }));
+            if (booksData.length == 0) {
+                reject("No Books Found with Provided Title")
+            } else {
+                resolve(JSON.stringify(booksData))
+            }
         } else {
-            return res.send(JSON.stringify(booksData))
+            reject("No Title Provided")
         }
-    } else {
-        return res.status(400).json({ message: "No Title Provided" })
-    }
+    })
+
+    findBookByTitle.then((msg) => {
+        return res.send(msg)
+    }).catch(reject => {
+        return res.status(400).json({ message: reject })
+    })
 });
 
 //  Get book review
